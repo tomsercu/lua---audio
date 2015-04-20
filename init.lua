@@ -161,3 +161,23 @@ local function samplevoice()
    return voice
 end
 rawset(audio, 'samplevoice', samplevoice)
+
+---
+local function fftfreq(...)
+   local window_size, samplespacing
+   local args = {...}
+   if select('#',...) == 2 then
+      window_size = args[1]
+      samplespacing = args[2]
+   else
+      print(dok.usage('audio.fftfreq',
+		      'compute the stft sample frequencies: [0, 1, ... , n/2] / (d*n)', nil,
+		      {type='number', help='n = window size of stft or spectrogram', req=true},
+		      {type='number', help='d = samplespacing = 1 / (sampling rate)', req=true}))
+      dok.error('incorrect arguments', 'audio.cqt')
+   end
+   -- calculate stft
+   local output = torch.range(0,window_size/2):mul(1./(window_size * samplespacing))
+   return output
+end
+rawset(audio, 'fftfreq', fftfreq)
