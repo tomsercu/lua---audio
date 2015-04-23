@@ -88,9 +88,7 @@ local function spectrogram(...)
    stftout_r:pow(2)
    stftout_c:pow(2)
    local stftout_magnitude = stftout_r + stftout_c
-   stftout_magnitude = stftout_magnitude + 0.01 -- adding constant to avoid log(0)
-   output = stftout_magnitude:log() * 10
-   return output:transpose(1,2)
+   return stftout_magnitude:transpose(1,2)
 end
 rawset(audio, 'spectrogram', spectrogram)
 
