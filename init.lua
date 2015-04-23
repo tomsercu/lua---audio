@@ -174,10 +174,52 @@ local function fftfreq(...)
 		      'compute the stft sample frequencies: [0, 1, ... , n/2] / (d*n)', nil,
 		      {type='number', help='n = window size of stft or spectrogram', req=true},
 		      {type='number', help='d = samplespacing = 1 / (sampling rate)', req=true}))
-      dok.error('incorrect arguments', 'audio.cqt')
+      dok.error('incorrect arguments', 'audio.fftfreq')
    end
-   -- calculate stft
    local output = torch.range(0,window_size/2):mul(1./(window_size * samplespacing))
    return output
 end
 rawset(audio, 'fftfreq', fftfreq)
+
+---
+local function melbins(...)
+   local fft_window_size, fft_samplespacing, nbins
+   local args = {...}
+   if select('#',...) == 3 then
+      window_size   = args[1]
+      samplespacing = args[2]
+      nbins         = args[3]
+   else
+      print(dok.usage('audio.melbins',
+		      'returns the weights matrix that maps the powers of the stft spectrum to the mel scale using triangular windows', nil,
+		      {type='number', help='n = window size of fft or spectrogram', req=true},
+		      {type='number', help='d = samplespacing = 1 / (sampling rate)', req=true},
+		      {type='number', help='nbins = number of mel bins', req=true}))
+      dok.error('incorrect arguments', 'audio.melbins')
+   end
+   local fftfreq = audio.fftfreq(window_size, samplespacing)
+   local weights = torch.Tensor(nbins, fftfreq:size(1)):zero()
+   local function B(f) return torch.log(f/700 + 1) * 1125 end
+   local function Binv(m) return (torch.exp(m/1125) - 1) * 700 end
+   local Fs = 1/samplespacing
+   local N = fftfreq:size(1)
+   local Blo, Bhi = B(fftfreq[1]), B(fftfreq[-1])
+   local boundaries = {}
+   for m = 0,nbins+1 do
+      local boundaryfreq = Binv(Blo + m * (Bhi-Blo)/(nbins+1))
+      --boundaries[m] = math.floor(window_size*samplespacing*boundaryfreq + 0.5) -- round to nearest freq
+      boundaries[m] = window_size*samplespacing*boundaryfreq -- do not round to nearest freq
+      --print(m,boundaryfreq,boundaries[m])
+   end
+   for m =  1,nbins do
+      for k,fk in ipairs(fftfreq:storage():totable()) do
+         if (k-1 >= boundaries[m-1]) and (k-1 <= boundaries[m]) then
+            weights[{m,k}] = (k-1-boundaries[m-1]) / (boundaries[m] - boundaries[m-1])
+         elseif (k-1 >= boundaries[m]) and (k-1 <= boundaries[m+1]) then
+            weights[{m,k}] = (boundaries[m+1] - (k-1)) / (boundaries[m+1] - boundaries[m])
+         end
+      end
+   end
+   return weights
+end
+rawset(audio, 'melbins', melbins)
