@@ -102,8 +102,8 @@ static THTensor * audio_(stft_generic)(THTensor *input,
     fftw_execute(plan);     // now apply rfftw over the buffer
         
     for (k=0; k < noutput; k++) {
-      output_data[outindex + k * 2] = (real) fbuffer[noutput - k - 1][0];
-      output_data[outindex + k * 2 + 1] = (real) fbuffer[noutput - k - 1][1];
+      output_data[outindex + k * 2] = (real) fbuffer[k][0];
+      output_data[outindex + k * 2 + 1] = (real) fbuffer[k][1];
     }
     outindex += noutput *2;
   }
