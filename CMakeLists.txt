@@ -6,13 +6,16 @@ CMAKE_POLICY(VERSION 2.8)
 FIND_PACKAGE(Torch REQUIRED)
 
 FIND_PATH(SOX_INCLUDE_DIR sox.h
-  "/usr/include/sox/")
-FIND_LIBRARY(SOX_LIBRARIES sox REQUIRED)
+  "/usr/include/sox/" "/share/apps/sox/14.4.1/intel/include/")
+FIND_LIBRARY(SOX_LIBRARIES sox REQUIRED
+  "/usr/include/sox/" "/share/apps/sox/14.4.1/intel/lib/")
 message ("SOX_INCLUDE_DIR: ${SOX_INCLUDE_DIR}")
 message ("SOX_LIBRARIES: ${SOX_LIBRARIES}")
 
-FIND_PATH(FFTW_INCLUDE_DIR fftw3.h)
-FIND_LIBRARY(FFTW_LIBRARIES fftw3 REQUIRED)
+FIND_PATH(FFTW_INCLUDE_DIR fftw3.h
+    "/share/apps/fftw/3.3.4/intel/include/")
+FIND_LIBRARY(FFTW_LIBRARIES fftw3 REQUIRED
+    "/share/apps/fftw/3.3.4/intel/lib/")
 message ("FFTW_INCLUDE_DIR: ${FFTW_INCLUDE_DIR}")
 message ("FFTW_LIBRARIES: ${FFTW_LIBRARIES}")
 

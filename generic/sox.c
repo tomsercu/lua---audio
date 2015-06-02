@@ -38,8 +38,8 @@ static THTensor * libsox_(read_audio_file)(const char *file_name)
 {
   // Create sox objects and read into int32_t buffer
   sox_format_t *fd;
-  fd = sox_open_read(file_name, NULL, NULL, "sndfile");
-  /*fd = sox_open_read(file_name, NULL, NULL, NULL);*/
+  /*fd = sox_open_read(file_name, NULL, NULL, "sndfile");*/
+  fd = sox_open_read(file_name, NULL, NULL, NULL);
   if (fd == NULL)
     abort_("[read_audio_file] Failure to read file");
   
