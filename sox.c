@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include <sox.h>
+#include <sndfile.h>
 
 void abort_(const char * s, ...)
 {
